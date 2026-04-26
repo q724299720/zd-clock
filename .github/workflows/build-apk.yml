@@ -39,9 +39,22 @@ jobs:
         sdkmanager --list_installed | grep -E "platforms|build-tools" | tail -10
 
     - name: Build Release APK
-      run: cd android && ./gradlew assembleRelease -PtargetSdkVersion=34 -x lint -x lintVitalRelease
+      run: cd android && ./gradlew assembleRelease -PtargetSdkVersion=34 -x lint -x lintVitalRelease --stacktrace 2>&1 | tee build.log
+
+    - name: Print build error on failure
+      if: failure()
+      run: |
+        echo "=== GRADLE BUILD FAILED ==="
+        tail -120 android/build.log 2>/dev/null || echo "no build.log"
+        echo "=== GRADLE DAEMON LOGS ==="
+        cat ~/.gradle/daemon/*/daemon-*.out.log 2>/dev/null | tail -80 || true
+        echo "=== ANDROID SDK STATUS ==="
+        echo "ANDROID_HOME=$ANDROID_HOME"
+        ls -la "$ANDROID_HOME"/build-tools/ 2>/dev/null || true
+        ls -la "$ANDROID_HOME"/platforms/ 2>/dev/null | grep -E "android-(35|36)" || true
 
     - name: Upload release APK
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: zd-clock-release-apk
