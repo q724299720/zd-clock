@@ -20,15 +20,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-    }
-    signingConfigs {
-        release {
-            storeFile file(System.getenv("KEYSTORE_PATH") ?: "../../zdclock.keystore")
-            storePassword System.getenv("KEYSTORE_PASSWORD") ?: "ZdClock2024"
-            keyAlias System.getenv("KEY_ALIAS") ?: "zdclock"
-            keyPassword System.getenv("KEY_PASSWORD") ?: "ZdClock2024"
         }
     }
     lintOptions {

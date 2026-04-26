@@ -38,18 +38,6 @@ jobs:
         sdkmanager "platforms;android-35" "build-tools;35.0.0" || true
         sdkmanager --list_installed | grep -E "platforms|build-tools" | tail -10
 
-    - name: Generate signing keystore
-      run: |
-        keytool -genkey -v \
-          -keystore zdclock.keystore \
-          -alias zdclock \
-          -keyalg RSA \
-          -keysize 2048 \
-          -validity 10000 \
-          -storepass ZdClock2024 \
-          -keypass ZdClock2024 \
-          -dname "CN=ZD Clock, OU=ZD, O=ZD, L=Shenzhen, ST=Guangdong, C=CN"
-
     - name: Build Debug APK
       run: cd android && ./gradlew assembleDebug -PcompileSdkVersion=35 -PtargetSdkVersion=34 -x lint -x lintVitalRelease
 
