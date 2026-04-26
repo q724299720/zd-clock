@@ -32,35 +32,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
-    - name: Build APK
+    - name: Build Release APK
       run: cd android && ./gradlew assembleRelease
 
-    - name: Sign APK
-      uses: r0adkll/sign-android-release@v1
-      id: sign_apk
-      with:
-        releaseDirectory: android/app/build/outputs/apk/release
-        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-        alias: ${{ secrets.ALIAS }}
-        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-        keyPassword: ${{ secrets.KEY_PASSWORD }}
-      env:
-        BUILD_TOOLS_VERSION: "34.0.0"
-      continue-on-error: true
-
-    - name: Upload unsigned APK
-      if: steps.sign_apk.outcome == 'failure'
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: zd-clock-unsigned
+        name: zd-clock-apk
         path: android/app/build/outputs/apk/release/app-release-unsigned.apk
-
-    - name: Upload signed APK
-      if: steps.sign_apk.outcome == 'success'
-      uses: actions/upload-artifact@v4
-      with:
-        name: zd-clock-signed
-        path: android/app/build/outputs/apk/release/*signed*.apk
 
     - name: Upload to Release
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -68,7 +47,7 @@ jobs:
       with:
         tag_name: v1.0.0
         name: 正点闹钟 v1.0.0
-        files: android/app/build/outputs/apk/release/*.apk
+        files: android/app/build/outputs/apk/release/app-release-unsigned.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       continue-on-error: true
