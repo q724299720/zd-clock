@@ -38,16 +38,6 @@ jobs:
         sdkmanager "platforms;android-35" "build-tools;35.0.0" || true
         sdkmanager --list_installed | grep -E "platforms|build-tools" | tail -10
 
-    - name: Build Release APK
-      run: cd android && ./gradlew assembleRelease -PcompileSdkVersion=35 -PtargetSdkVersion=34 -x lint -x lintVitalRelease --stacktrace 2>&1 | tee ../build-log.txt
-
-    - name: Upload build log (on failure)
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-log
-        path: build-log.txt
-
     - name: Generate signing keystore
       run: |
         keytool -genkey -v \
@@ -60,64 +50,19 @@ jobs:
           -keypass ZdClock2024 \
           -dname "CN=ZD Clock, OU=ZD, O=ZD, L=Shenzhen, ST=Guangdong, C=CN"
 
-    - name: Sign APK (v1 + v2)
-      run: |
-        {
-          set -e
-          SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          echo "SDK_ROOT=$SDK_ROOT"
-          
-          BUILD_TOOLS=$(ls -d "$SDK_ROOT"/build-tools/* | sort -V | tail -1)
-          echo "Using build-tools: $BUILD_TOOLS"
-          
-          UNSIGNED_APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
-          ALIGNED_APK="android/app/build/outputs/apk/release/app-release-aligned.apk"
-          SIGNED_APK="android/app/build/outputs/apk/release/app-release-signed.apk"
-          
-          echo "Step 1: jarsigner v1 signature..."
-          jarsigner -verbose \
-            -sigalg SHA256withRSA \
-            -digestalg SHA-256 \
-            -keystore zdclock.keystore \
-            -storepass ZdClock2024 \
-            -keypass ZdClock2024 \
-            "$UNSIGNED_APK" \
-            zdclock
-          
-          echo "Step 2: zipalign..."
-          "$BUILD_TOOLS/zipalign" -v 4 \
-            "$UNSIGNED_APK" \
-            "$ALIGNED_APK"
-          
-          echo "Step 3: apksigner v2 signature..."
-          "$BUILD_TOOLS/apksigner" sign \
-            --ks zdclock.keystore \
-            --ks-pass pass:ZdClock2024 \
-            --key-pass pass:ZdClock2024 \
-            --v1-signing-enabled true \
-            --v2-signing-enabled true \
-            --out "$SIGNED_APK" \
-            "$ALIGNED_APK"
-          
-          echo "Step 4: verify signature..."
-          "$BUILD_TOOLS/apksigner" verify -v "$SIGNED_APK"
-          echo "All done!"
-        } > sign-log.txt 2>&1
-
-    - name: Upload sign log
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: sign-log
-        path: sign-log.txt
+    - name: Build Signed Release APK
+      run: cd android && ./gradlew assembleRelease -PcompileSdkVersion=35 -PtargetSdkVersion=34 -x lint -x lintVitalRelease
+      env:
+        KEYSTORE_PATH: ../zdclock.keystore
+        KEYSTORE_PASSWORD: ZdClock2024
+        KEY_ALIAS: zdclock
+        KEY_PASSWORD: ZdClock2024
 
     - name: Upload signed APK
       uses: actions/upload-artifact@v4
       with:
         name: zd-clock-signed-apk
-        path: android/app/build/outputs/apk/release/app-release-signed.apk
+        path: android/app/build/outputs/apk/release/app-release.apk
 
     - name: Upload to Release
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -125,7 +70,7 @@ jobs:
       with:
         tag_name: v1.0.0
         name: 正点闹钟 v1.0.0
-        files: android/app/build/outputs/apk/release/app-release-signed.apk
+        files: android/app/build/outputs/apk/release/app-release.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       continue-on-error: true
