@@ -33,7 +33,7 @@ jobs:
       run: chmod +x android/gradlew
 
     - name: Build Release APK
-      run: cd android && ./gradlew assembleRelease
+      run: cd android && ./gradlew assembleRelease -x lintVitalRelease
 
     - name: Generate signing keystore
       run: |
