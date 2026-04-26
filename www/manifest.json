@@ -1,0 +1,22 @@
+{
+  "name": "\u6b63\u70b9\u95f9\u949f",
+  "short_name": "\u6b63\u70b9\u95f9\u949f",
+  "description": "\u624b\u673a\u7aef\u7f51\u9875\u95f9\u949fAPP - \u65f6\u949f\u3001\u95f9\u949f\u3001\u5012\u8ba1\u65f6\u3001\u79d2\u8868\u3001\u4e16\u754c\u65f6\u949f\u3001\u8bb0\u5fc6\u6e38\u620f",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

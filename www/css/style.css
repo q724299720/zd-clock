@@ -1,0 +1,1227 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+}
+
+:root {
+    --bg: #1a1a2e;
+    --bg-card: #16213e;
+    --bg-card-hover: #1e2a4a;
+    --text: #eaeaea;
+    --text-secondary: #a0a0b0;
+    --accent: #e94560;
+    --accent-light: #ff6b81;
+    --border: #2a2a4a;
+    --shadow: rgba(0,0,0,0.3);
+    --switch-bg: #3a3a5c;
+    --switch-on: #e94560;
+}
+
+:root[data-theme="light"] {
+    --bg: #f5f5f7;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f0f0f5;
+    --text: #1a1a2e;
+    --text-secondary: #666680;
+    --accent: #e94560;
+    --accent-light: #ff6b81;
+    --border: #e0e0e5;
+    --shadow: rgba(0,0,0,0.1);
+    --switch-bg: #d0d0d8;
+    --switch-on: #e94560;
+}
+
+:root[data-theme="blue"] {
+    --bg: #0f172a;
+    --bg-card: #1e3a5f;
+    --bg-card-hover: #264d7a;
+    --text: #e0f2fe;
+    --text-secondary: #94a3b8;
+    --accent: #38bdf8;
+    --accent-light: #7dd3fc;
+    --border: #1e3a5f;
+    --shadow: rgba(0,0,0,0.3);
+    --switch-bg: #1e3a5f;
+    --switch-on: #38bdf8;
+}
+
+:root[data-theme="purple"] {
+    --bg: #2e1065;
+    --bg-card: #4c1d95;
+    --bg-card-hover: #5b21b6;
+    --text: #f3e8ff;
+    --text-secondary: #c4b5fd;
+    --accent: #a855f7;
+    --accent-light: #d8b4fe;
+    --border: #4c1d95;
+    --shadow: rgba(0,0,0,0.3);
+    --switch-bg: #4c1d95;
+    --switch-on: #a855f7;
+}
+
+:root[data-theme="orange"] {
+    --bg: #fff7ed;
+    --bg-card: #ffedd5;
+    --bg-card-hover: #fed7aa;
+    --text: #431407;
+    --text-secondary: #78350f;
+    --accent: #f97316;
+    --accent-light: #fb923c;
+    --border: #fed7aa;
+    --shadow: rgba(0,0,0,0.1);
+    --switch-bg: #fed7aa;
+    --switch-on: #f97316;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+}
+
+#app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* ========== 页面 ========== */
+.page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.page.hidden {
+    display: none !important;
+}
+
+/* ========== 状态栏 ========== */
+.status-bar {
+    padding: 8px 16px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* ========== 内容区 ========== */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 80px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-content {
+    display: none;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== 时钟页 ========== */
+.clock-display {
+    text-align: center;
+    padding: 40px 0 20px;
+}
+
+.clock-time {
+    font-size: 72px;
+    font-weight: 200;
+    letter-spacing: 4px;
+    line-height: 1;
+    color: var(--text);
+}
+
+.clock-seconds {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--accent);
+    margin-top: 4px;
+}
+
+.clock-date {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-top: 12px;
+}
+
+.clock-lunar {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+.next-alarm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 12px 20px;
+    background: var(--bg-card);
+    border-radius: 24px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.next-icon {
+    font-size: 16px;
+}
+
+/* ========== 闹钟页 ========== */
+.alarms-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.alarms-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.btn-add {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.alarms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.alarm-item {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+}
+
+.alarm-item:active {
+    transform: scale(0.98);
+}
+
+.alarm-info {
+    flex: 1;
+}
+
+.alarm-time {
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
+}
+
+.alarm-details {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.alarm-label {
+    color: var(--accent);
+}
+
+.alarm-repeat {
+    font-size: 12px;
+}
+
+.alarm-toggle {
+    width: 50px;
+    height: 28px;
+    border-radius: 14px;
+    background: var(--switch-bg);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+
+.alarm-toggle.on {
+    background: var(--switch-on);
+}
+
+.alarm-toggle::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.alarm-toggle.on::after {
+    transform: translateX(22px);
+}
+
+/* ========== 倒计时页 ========== */
+.timer-main {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.timer-display {
+    font-size: 56px;
+    font-weight: 200;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+}
+
+.timer-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.timer-input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.timer-input-group input {
+    width: 70px;
+    height: 60px;
+    font-size: 28px;
+    text-align: center;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+    color: var(--text);
+    outline: none;
+}
+
+.timer-input-group label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.timer-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.timer-presets button {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.timer-presets button:active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.timer-controls button {
+    padding: 14px 36px;
+    border-radius: 28px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-timer-start {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-timer-pause {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-timer-reset {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.timers-active {
+    margin-top: 24px;
+}
+
+.timers-active h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+}
+
+.timers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.timer-item {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.timer-item-time {
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.timer-item-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.timer-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.timer-item-actions button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-timer-play {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-timer-delete {
+    background: #ef4444;
+    color: white;
+}
+
+/* ========== 秒表页 ========== */
+.stopwatch-display {
+    font-size: 48px;
+    font-weight: 200;
+    text-align: center;
+    padding: 40px 0;
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.stopwatch-controls {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stopwatch-controls button {
+    padding: 14px 32px;
+    border-radius: 28px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-sw-start, .btn-sw-lap {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-sw-stop {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-sw-reset {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.laps-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.lap-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+}
+
+.lap-item:nth-child(odd) {
+    background: var(--bg-card);
+}
+
+/* ========== 世界时钟页 ========== */
+.world-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.world-header h2 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.local-time-card {
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.local-time-card .city-name {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.local-time-card .city-time {
+    font-size: 36px;
+    font-weight: 300;
+    margin-top: 4px;
+}
+
+.local-time-card .city-date {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+.world-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.world-item {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.world-item-info {
+    flex: 1;
+}
+
+.world-item-name {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.world-item-offset {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.world-item-time {
+    font-size: 22px;
+    font-weight: 300;
+    text-align: right;
+}
+
+.world-item-delete {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #ef4444;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========== 设置页 ========== */
+.settings-group {
+    margin-bottom: 24px;
+}
+
+.settings-group h2,
+.settings-group h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+.settings-group h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+}
+
+.setting-item select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+}
+
+/* Switch */
+.switch {
+    position: relative;
+    width: 50px;
+    height: 28px;
+    display: inline-block;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--switch-bg);
+    border-radius: 14px;
+    transition: 0.3s;
+}
+
+.slider::before {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.switch input:checked + .slider {
+    background: var(--switch-on);
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(22px);
+}
+
+.about-info {
+    text-align: center;
+    padding: 20px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.about-info p {
+    margin-bottom: 6px;
+}
+
+.about-info .hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.7;
+    margin-top: 12px;
+}
+
+/* ========== 底部导航 ========== */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 8px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 10px;
+    cursor: pointer;
+    position: relative;
+}
+
+.nav-item.active {
+    color: var(--accent);
+}
+
+.nav-icon {
+    font-size: 20px;
+}
+
+.nav-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========== 弹窗 ========== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.modal.hidden {
+    display: none !important;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background: var(--bg);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    font-size: 18px;
+}
+
+.btn-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 16px 20px 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-save {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Time picker */
+.time-picker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.time-wheel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.time-wheel input {
+    width: 80px;
+    height: 60px;
+    font-size: 32px;
+    text-align: center;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-card);
+    color: var(--text);
+    outline: none;
+}
+
+.time-wheel button {
+    width: 40px;
+    height: 32px;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text);
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.time-sep {
+    font-size: 32px;
+    font-weight: 200;
+    margin-top: 8px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+}
+
+.repeat-days {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.day-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.day-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+}
+
+.repeat-presets {
+    display: flex;
+    gap: 8px;
+}
+
+.repeat-presets button {
+    flex: 1;
+    padding: 8px 0;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.repeat-presets button:active {
+    background: var(--accent);
+    color: white;
+}
+
+/* City search */
+.city-search input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 15px;
+    margin-bottom: 12px;
+    outline: none;
+}
+
+.city-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.city-option {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.city-option:last-child {
+    border-bottom: none;
+}
+
+.city-option-name {
+    font-size: 15px;
+}
+
+.city-option-offset {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* ========== 响铃页面 ========== */
+#alarm-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2000;
+    background: linear-gradient(180deg, #e94560, #1a1a2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ring-container {
+    text-align: center;
+    color: white;
+    padding: 40px;
+}
+
+.ring-time {
+    font-size: 80px;
+    font-weight: 200;
+    margin-bottom: 12px;
+}
+
+.ring-label {
+    font-size: 24px;
+    opacity: 0.9;
+    margin-bottom: 40px;
+}
+
+.ring-animation {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 40px;
+}
+
+.ring-wave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.5);
+    animation: ringWave 2s ease-out infinite;
+}
+
+.ring-wave:nth-child(1) {
+    width: 60px;
+    height: 60px;
+    animation-delay: 0s;
+}
+
+.ring-wave:nth-child(2) {
+    width: 90px;
+    height: 90px;
+    animation-delay: 0.5s;
+}
+
+.ring-wave:nth-child(3) {
+    width: 120px;
+    height: 120px;
+    animation-delay: 1s;
+}
+
+@keyframes ringWave {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+
+.ring-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.btn-snooze {
+    padding: 14px 40px;
+    border-radius: 28px;
+    border: 2px solid rgba(255,255,255,0.5);
+    background: transparent;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-dismiss {
+    padding: 14px 40px;
+    border-radius: 28px;
+    border: none;
+    background: white;
+    color: #e94560;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ========== 记忆游戏 ========== */
+#memory-game {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2001;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.game-title {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 16px;
+    color: var(--text);
+}
+
+.game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.game-card {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.game-card.flipped {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent-light);
+}
+
+.game-card.matched {
+    background: #22c55e;
+    color: white;
+    border-color: #4ade80;
+    cursor: default;
+}
+
+.game-actions {
+    text-align: center;
+}
+
+.btn-giveup {
+    padding: 10px 24px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ========== 工具类 ========== */
+.hidden {
+    display: none !important;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+/* ========== 响应式 ========== */
+@media (min-width: 768px) {
+    .clock-time {
+        font-size: 96px;
+    }
+    .timer-display {
+        font-size: 72px;
+    }
+    .stopwatch-display {
+        font-size: 64px;
+    }
+}
+
+/* ========== 选中文本高亮 ========== */
+::selection {
+    background: var(--accent);
+    color: white;
+}

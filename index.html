@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>正点闹钟</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 响铃页面 -->
+        <div id="alarm-ring" class="page hidden">
+            <div class="ring-container">
+                <div class="ring-time" id="ring-time">00:00</div>
+                <div class="ring-label" id="ring-label">起床</div>
+                <div class="ring-animation">
+                    <div class="ring-wave"></div>
+                    <div class="ring-wave"></div>
+                    <div class="ring-wave"></div>
+                </div>
+                <div class="ring-actions">
+                    <button class="btn-snooze" id="btn-snooze">
+                    贪睡 5 分钟</button>
+                    <button class="btn-dismiss" id="btn-dismiss">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 记忆游戏关闭页面 -->
+        <div id="memory-game" class="page hidden">
+            <div class="game-container">
+                <div class="game-title">完成游戏才能关闭闹钟</div>
+                <div class="game-stats">
+                    <span>翻开: <b id="flips">0</b></span>
+                    <span>匹配: <b id="matches">0</b>/8</span>
+                </div>
+                <div class="game-grid" id="game-grid"></div>
+                <div class="game-actions">
+                    <button class="btn-giveup" id="btn-giveup">我认输了</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主页面 -->
+        <div id="main-page" class="page">
+            <!-- 顶部状态栏 -->
+            <div class="status-bar">
+                <span class="battery" id="battery">--%</span>
+            </div>
+
+            <!-- 页面内容区 -->
+            <div class="content" id="content">
+                <!-- 时钟页 -->
+                <div class="tab-content active" id="tab-clock">
+                    <div class="clock-display">
+                        <div class="clock-time" id="clock-time">00:00</div>
+                        <div class="clock-seconds" id="clock-seconds">00</div>
+                        <div class="clock-date" id="clock-date">1月1日 星期一</div>
+                        <div class="clock-lunar" id="clock-lunar"></div>
+                    </div>
+                    <div class="next-alarm" id="next-alarm">
+                        <span class="next-icon">🔔</span>
+                        <span id="next-alarm-text">暂无待响闹钟</span>
+                    </div>
+                </div>
+
+                <!-- 闹钟页 -->
+                <div class="tab-content" id="tab-alarms">
+                    <div class="alarms-header">
+                        <h2>我的闹钟</h2>
+                        <button class="btn-add" id="btn-add-alarm">+</button>
+                    </div>
+                    <div class="alarms-list" id="alarms-list"></div>
+                </div>
+
+                <!-- 倒计时页 -->
+                <div class="tab-content" id="tab-timer">
+                    <div class="timer-main">
+                        <div class="timer-display" id="timer-display">00:00:00</div>
+                        <div class="timer-inputs" id="timer-inputs">
+                            <div class="timer-input-group">
+                                <input type="number" id="timer-h" min="0" max="99" value="0" placeholder="时">
+                                <label>时</label>
+                            </div>
+                            <div class="timer-input-group">
+                                <input type="number" id="timer-m" min="0" max="59" value="5" placeholder="分">
+                                <label>分</label>
+                            </div>
+                            <div class="timer-input-group">
+                                <input type="number" id="timer-s" min="0" max="59" value="0" placeholder="秒">
+                                <label>秒</label>
+                            </div>
+                        </div>
+                        <div class="timer-presets">
+                            <button data-time="180">油炸3分钟</button>
+                            <button data-time="300">午休5分钟</button>
+                            <button data-time="600">涅4分钟</button>
+                            <button data-time="1500">番茄25分钟</button>
+                            <button data-time="1800">半小时</button>
+                            <button data-time="3600">一小时</button>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="btn-timer-start" id="btn-timer-start">开始</button>
+                            <button class="btn-timer-pause hidden" id="btn-timer-pause">暂停</button>
+                            <button class="btn-timer-reset" id="btn-timer-reset">重置</button>
+                        </div>
+                    </div>
+                    <div class="timers-active" id="timers-active">
+                        <h3>运行中的倒计时</h3>
+                        <div class="timers-list" id="timers-list"></div>
+                    </div>
+                </div>
+
+                <!-- 秒表页 -->
+                <div class="tab-content" id="tab-stopwatch">
+                    <div class="stopwatch-display" id="stopwatch-display">00:00:00.00</div>
+                    <div class="stopwatch-controls">
+                        <button class="btn-sw-start" id="btn-sw-start">开始</button>
+                        <button class="btn-sw-lap hidden" id="btn-sw-lap">计时</button>
+                        <button class="btn-sw-stop hidden" id="btn-sw-stop">停止</button>
+                        <button class="btn-sw-reset hidden" id="btn-sw-reset">重置</button>
+                    </div>
+                    <div class="laps-list" id="laps-list"></div>
+                </div>
+
+                <!-- 世界时钟页 -->
+                <div class="tab-content" id="tab-world">
+                    <div class="world-header">
+                        <h2>世界时钟</h2>
+                        <button class="btn-add" id="btn-add-city">+</button>
+                    </div>
+                    <div class="local-time-card">
+                        <div class="city-name">当前位置</div>
+                        <div class="city-time" id="local-time">--:--</div>
+                        <div class="city-date" id="local-date">--</div>
+                    </div>
+                    <div class="world-list" id="world-list"></div>
+                </div>
+
+                <!-- 设置页 -->
+                <div class="tab-content" id="tab-settings">
+                    <h2>设置</h2>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <span>渐强铃声</span>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-fade-in" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>震动提醒</span>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-vibrate" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>语音播报</span>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-tts" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>24小时制</span>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-24h" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>记忆游戏关闹钟</span>
+                            <label class="switch">
+                                <input type="checkbox" id="setting-memory">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <span>贪睡时间（分钟）</span>
+                            <select id="setting-snooze">
+                                <option value="3">3</option>
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <span>主题</span>
+                            <select id="setting-theme">
+                                <option value="dark">深色模式</option>
+                                <option value="light">浅色模式</option>
+                                <option value="blue">蓝色海洋</option>
+                                <option value="purple">紫色幻梦</option>
+                                <option value="orange">暖色阳光</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h3>关于</h3>
+                        <div class="about-info">
+                            <p>正点闹钟</p>
+                            <p>版本 1.0.0</p>
+                            <p class="hint">提示：网页版闹钟需保持前台才能响铃</p>
+                            <p class="hint">建议：添加到主屏幕以获得最佳体验</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部导航 -->
+            <nav class="bottom-nav">
+                <button class="nav-item active" data-tab="clock">
+                    <span class="nav-icon">🕐</span>
+                    <span class="nav-label">时钟</span>
+                </button>
+                <button class="nav-item" data-tab="alarms">
+                    <span class="nav-icon">🔔</span>
+                    <span class="nav-label">闹钟</span>
+                    <span class="nav-badge hidden" id="alarm-badge">0</span>
+                </button>
+                <button class="nav-item" data-tab="timer">
+                    <span class="nav-icon">⏲️</span>
+                    <span class="nav-label">倒计时</span>
+                </button>
+                <button class="nav-item" data-tab="stopwatch">
+                    <span class="nav-icon">⏱️</span>
+                    <span class="nav-label">秒表</span>
+                </button>
+                <button class="nav-item" data-tab="world">
+                    <span class="nav-icon">🌍</span>
+                    <span class="nav-label">世界</span>
+                </button>
+                <button class="nav-item" data-tab="settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-label">设置</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- 添加/编辑闹钟弹窗 -->
+        <div class="modal hidden" id="alarm-modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="alarm-modal-title">添加闹钟</h3>
+                    <button class="btn-close" id="btn-close-alarm">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="time-picker">
+                        <div class="time-wheel">
+                            <button class="time-up" data-field="hour">▲</button>
+                            <input type="number" id="alarm-hour" min="0" max="23" value="07">
+                            <button class="time-down" data-field="hour">▼</button>
+                        </div>
+                        <span class="time-sep">:</span>
+                        <div class="time-wheel">
+                            <button class="time-up" data-field="minute">▲</button>
+                            <input type="number" id="alarm-minute" min="0" max="59" value="00">
+                            <button class="time-down" data-field="minute">▼</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>标签</label>
+                        <input type="text" id="alarm-label" placeholder="起床" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>重复</label>
+                        <div class="repeat-days">
+                            <button class="day-btn" data-day="1">一</button>
+                            <button class="day-btn" data-day="2">二</button>
+                            <button class="day-btn" data-day="3">三</button>
+                            <button class="day-btn" data-day="4">四</button>
+                            <button class="day-btn" data-day="5">五</button>
+                            <button class="day-btn" data-day="6">六</button>
+                            <button class="day-btn" data-day="0">日</button>
+                        </div>
+                        <div class="repeat-presets">
+                            <button data-preset="once">仅一次</button>
+                            <button data-preset="workday">工作日</button>
+                            <button data-preset="weekend">周末</button>
+                            <button data-preset="everyday">每天</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>铃声</label>
+                        <select id="alarm-sound">
+                            <option value="default">默认铃声</option>
+                            <option value="gentle">温柔唤醒</option>
+                            <option value="energetic">激情活力</option>
+                            <option value="nature">自然之音</option>
+                            <option value="electronic">电子节奏</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-save" id="btn-save-alarm">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加城市弹窗 -->
+        <div class="modal hidden" id="city-modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>添加城市</h3>
+                    <button class="btn-close" id="btn-close-city">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="city-search">
+                        <input type="text" id="city-search" placeholder="搜索城市...">
+                    </div>
+                    <div class="city-list" id="city-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

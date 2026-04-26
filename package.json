@@ -1,0 +1,19 @@
+{
+  "name": "zd-clock",
+  "version": "1.0.0",
+  "description": "正点闹钟 - 手机端网页闹钟APP",
+  "scripts": {
+    "sync": "npx cap sync android",
+    "build": "cd android && ./gradlew assembleRelease",
+    "android": "npx cap open android",
+    "dev": "npx cap sync android && npx cap open android"
+  },
+  "keywords": ["alarm", "clock", "pwa", "capacitor"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  }
+}
