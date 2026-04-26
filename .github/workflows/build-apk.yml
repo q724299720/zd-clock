@@ -53,7 +53,7 @@ jobs:
     - name: Build Signed Release APK
       run: cd android && ./gradlew assembleRelease -PcompileSdkVersion=35 -PtargetSdkVersion=34 -x lint -x lintVitalRelease
       env:
-        KEYSTORE_PATH: ../zdclock.keystore
+        KEYSTORE_PATH: ../../zdclock.keystore
         KEYSTORE_PASSWORD: ZdClock2024
         KEY_ALIAS: zdclock
         KEY_PASSWORD: ZdClock2024
