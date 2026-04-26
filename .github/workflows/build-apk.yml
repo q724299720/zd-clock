@@ -62,15 +62,20 @@ jobs:
 
     - name: Sign APK (v1 + v2)
       run: |
-        # 检查 build tools 路径
-        BUILD_TOOLS=$(ls -d $ANDROID_SDK_ROOT/build-tools/* | sort -V | tail -1)
+        set -e
+        SDK_ROOT="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+        echo "ANDROID_HOME=$ANDROID_HOME"
+        echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+        echo "SDK_ROOT=$SDK_ROOT"
+        
+        BUILD_TOOLS=$(ls -d "$SDK_ROOT"/build-tools/* | sort -V | tail -1)
         echo "Using build-tools: $BUILD_TOOLS"
         
         UNSIGNED_APK="android/app/build/outputs/apk/release/app-release-unsigned.apk"
         ALIGNED_APK="android/app/build/outputs/apk/release/app-release-aligned.apk"
         SIGNED_APK="android/app/build/outputs/apk/release/app-release-signed.apk"
         
-        # 1. jarsigner v1 签名
+        echo "Step 1: jarsigner v1 signature..."
         jarsigner -verbose \
           -sigalg SHA256withRSA \
           -digestalg SHA-256 \
@@ -80,12 +85,12 @@ jobs:
           "$UNSIGNED_APK" \
           zdclock
         
-        # 2. zipalign 对齐
+        echo "Step 2: zipalign..."
         "$BUILD_TOOLS/zipalign" -v 4 \
           "$UNSIGNED_APK" \
           "$ALIGNED_APK"
         
-        # 3. apksigner v2 签名（华为/现代 Android 必需）
+        echo "Step 3: apksigner v2 signature..."
         "$BUILD_TOOLS/apksigner" sign \
           --ks zdclock.keystore \
           --ks-pass pass:ZdClock2024 \
@@ -95,8 +100,9 @@ jobs:
           --out "$SIGNED_APK" \
           "$ALIGNED_APK"
         
-        # 4. 验证签名
+        echo "Step 4: verify signature..."
         "$BUILD_TOOLS/apksigner" verify -v "$SIGNED_APK"
+        echo "All done!"
 
     - name: Upload signed APK
       uses: actions/upload-artifact@v4
