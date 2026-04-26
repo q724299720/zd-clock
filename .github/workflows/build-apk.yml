@@ -38,11 +38,37 @@ jobs:
     - name: Build Release APK
       run: cd android && ./gradlew assembleRelease
 
-    - name: Upload APK
+    - name: Generate signing keystore
+      run: |
+        keytool -genkey -v \
+          -keystore zdclock.keystore \
+          -alias zdclock \
+          -keyalg RSA \
+          -keysize 2048 \
+          -validity 10000 \
+          -storepass ZdClock2024 \
+          -keypass ZdClock2024 \
+          -dname "CN=ZD Clock, OU=ZD, O=ZD, L=Shenzhen, ST=Guangdong, C=CN"
+
+    - name: Sign APK
+      run: |
+        jarsigner -verbose \
+          -sigalg SHA256withRSA \
+          -digestalg SHA-256 \
+          -keystore zdclock.keystore \
+          -storepass ZdClock2024 \
+          -keypass ZdClock2024 \
+          android/app/build/outputs/apk/release/app-release-unsigned.apk \
+          zdclock
+        # 复制为签名后的文件名
+        cp android/app/build/outputs/apk/release/app-release-unsigned.apk \
+           android/app/build/outputs/apk/release/app-release-signed.apk
+
+    - name: Upload signed APK
       uses: actions/upload-artifact@v4
       with:
-        name: zd-clock-apk
-        path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+        name: zd-clock-signed-apk
+        path: android/app/build/outputs/apk/release/app-release-signed.apk
 
     - name: Upload to Release
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -50,7 +76,7 @@ jobs:
       with:
         tag_name: v1.0.0
         name: 正点闹钟 v1.0.0
-        files: android/app/build/outputs/apk/release/app-release-unsigned.apk
+        files: android/app/build/outputs/apk/release/app-release-signed.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       continue-on-error: true
