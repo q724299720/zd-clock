@@ -39,7 +39,22 @@ jobs:
         sdkmanager --list_installed | grep -E "platforms|build-tools" | tail -10
 
     - name: Build Debug APK
-      run: cd android && ./gradlew assembleDebug -x lint -x lintVitalRelease
+      run: cd android && ./gradlew assembleDebug -x lint -x lintVitalRelease 2>&1 | tee build.log || (EXIT=$? && echo "GRADLE_EXIT=$EXIT" && exit $EXIT)
+
+    - name: Print build error on failure
+      if: failure()
+      run: |
+        echo "=== GRADLE BUILD FAILED ==="
+        tail -80 android/build.log 2>/dev/null || echo "no build.log"
+        echo "=== GRADLE DAEMON LOGS ==="
+        ls ~/.gradle/daemon/ 2>/dev/null || true
+        cat ~/.gradle/daemon/*/daemon-*.out.log 2>/dev/null | tail -50 || true
+        echo "=== ANDROID SDK STATUS ==="
+        echo "ANDROID_HOME=$ANDROID_HOME"
+        ls -la "$ANDROID_HOME"/build-tools/ 2>/dev/null || true
+        ls -la "$ANDROID_HOME"/platforms/ 2>/dev/null | grep android-35 || true
+        echo "=== APP BUILD GRADLE ==="
+        cat android/app/build.gradle | head -30 || true
 
     - name: Upload debug APK
       uses: actions/upload-artifact@v4
