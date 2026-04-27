@@ -48,7 +48,12 @@ jobs:
       if: failure()
       run: |
         echo "=== GRADLE BUILD FAILED ==="
-        tail -120 android/build.log 2>/dev/null || echo "no build.log"
+        echo "=== build.log (first 100 lines) ==="
+        head -100 android/build.log 2>/dev/null || echo "no build.log"
+        echo ""
+        echo "=== build.log (last 150 lines) ==="
+        tail -150 android/build.log 2>/dev/null || echo "no build.log"
+        echo ""
         echo "=== GRADLE DAEMON LOGS ==="
         cat ~/.gradle/daemon/*/daemon-*.out.log 2>/dev/null | tail -80 || true
         echo "=== ANDROID SDK STATUS ==="
