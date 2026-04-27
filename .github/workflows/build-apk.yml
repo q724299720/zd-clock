@@ -32,50 +32,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x android/gradlew
 
-    - name: Install Android SDK Platform 35
-      run: |
-        export ANDROID_SDK_ROOT=$ANDROID_HOME
-        sdkmanager "platforms;android-35" "build-tools;35.0.0" || true
-        sdkmanager --list_installed | grep -E "platforms|build-tools" | tail -10
-
     - name: Build Debug APK
-      run: |
-        cd android
-        set -o pipefail
-        ./gradlew assembleDebug -x lint -x lintVitalRelease --stacktrace 2>&1 | tee build.log
-
-    - name: Print build error on failure
-      if: failure()
-      run: |
-        echo "=== GRADLE BUILD FAILED ==="
-        echo "=== build.log (first 100 lines) ==="
-        head -100 android/build.log 2>/dev/null || echo "no build.log"
-        echo ""
-        echo "=== build.log (last 150 lines) ==="
-        tail -150 android/build.log 2>/dev/null || echo "no build.log"
-        echo ""
-        echo "=== GRADLE DAEMON LOGS ==="
-        cat ~/.gradle/daemon/*/daemon-*.out.log 2>/dev/null | tail -80 || true
-        echo "=== ANDROID SDK STATUS ==="
-        echo "ANDROID_HOME=$ANDROID_HOME"
-        ls -la "$ANDROID_HOME"/build-tools/ 2>/dev/null || true
-        ls -la "$ANDROID_HOME"/platforms/ 2>/dev/null | grep -E "android-(35|36)" || true
-
-    - name: Upload build logs on failure
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-logs
-        path: android/build.log
-      continue-on-error: true
-
-    - name: List APK files
-      if: success()
-      run: |
-        echo "=== Listing APK files ==="
-        find android/app/build/outputs -name "*.apk" -ls 2>/dev/null || echo "No APK found"
-        echo "=== Listing debug dir ==="
-        ls -la android/app/build/outputs/apk/debug/ 2>/dev/null || echo "debug dir not found"
+      run: cd android && ./gradlew assembleDebug -x lint -x lintVitalRelease
 
     - name: Upload debug APK
       if: success()
