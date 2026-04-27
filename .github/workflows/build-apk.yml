@@ -53,6 +53,14 @@ jobs:
         ls -la "$ANDROID_HOME"/build-tools/ 2>/dev/null || true
         ls -la "$ANDROID_HOME"/platforms/ 2>/dev/null | grep -E "android-(35|36)" || true
 
+    - name: List APK files
+      if: success()
+      run: |
+        echo "=== Listing APK files ==="
+        find android/app/build/outputs -name "*.apk" -ls 2>/dev/null || echo "No APK found"
+        echo "=== Listing release dir ==="
+        ls -la android/app/build/outputs/apk/release/ 2>/dev/null || echo "release dir not found"
+
     - name: Upload release APK
       if: success()
       uses: actions/upload-artifact@v4
