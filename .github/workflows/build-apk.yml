@@ -60,6 +60,19 @@ jobs:
         find android/app/build/outputs -name "*.apk" -ls 2>/dev/null || echo "No APK found"
         echo "=== Listing release dir ==="
         ls -la android/app/build/outputs/apk/release/ 2>/dev/null || echo "release dir not found"
+        echo "=== Full outputs tree ==="
+        find android/app/build/outputs -type f 2>/dev/null | head -20 || echo "outputs dir empty"
+
+    - name: Verify APK exists
+      if: success()
+      run: |
+        APK=$(find android/app/build/outputs -name "*.apk" | head -1)
+        if [ -z "$APK" ]; then
+          echo "ERROR: No APK file found!"
+          exit 1
+        fi
+        echo "Found APK: $APK"
+        ls -lh "$APK"
 
     - name: Upload release APK
       if: success()
