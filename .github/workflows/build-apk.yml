@@ -61,6 +61,14 @@ jobs:
         ls -la "$ANDROID_HOME"/build-tools/ 2>/dev/null || true
         ls -la "$ANDROID_HOME"/platforms/ 2>/dev/null | grep -E "android-(35|36)" || true
 
+    - name: Upload build logs on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-logs
+        path: android/build.log
+      continue-on-error: true
+
     - name: List APK files
       if: success()
       run: |
