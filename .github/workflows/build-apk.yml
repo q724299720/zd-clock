@@ -33,7 +33,13 @@ jobs:
       run: chmod +x android/gradlew
 
     - name: Build Debug APK
-      run: cd android && ./gradlew assembleDebug -x lint -x lintVitalRelease
+      run: |
+        cd android
+        ./gradlew assembleDebug -x lint -x lintVitalRelease > gradle.log 2>&1 || {
+          echo "=== GRADLE BUILD FAILED ==="
+          cat gradle.log
+          exit 1
+        }
 
     - name: Upload debug APK
       if: success()
