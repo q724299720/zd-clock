@@ -36,7 +36,10 @@ jobs:
       run: |
         cd android
         ./gradlew assembleDebug -x lint -x lintVitalRelease > gradle.log 2>&1 || {
-          echo "=== GRADLE BUILD FAILED ==="
+          echo "=== GRADLE BUILD FAILED ===" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -200 gradle.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           cat gradle.log
           exit 1
         }
